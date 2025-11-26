@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Boolean
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, DateTime, JSON
 from sqlalchemy.orm import relationship
-from .database import Base
+from database import Base
 from datetime import datetime, date
 
 class User(Base):
@@ -75,6 +75,8 @@ class FutureGoalExpense(Base):
     name = Column(String, index=True)
     amount = Column(Float)
     target_date = Column(DateTime) # We will use this to determine the year/month
+    image_url = Column(String, nullable=True)
+    goal_type = Column(String, default="lump_sum") # 'lump_sum' or 'cash_flow'
     
     owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="future_goals")

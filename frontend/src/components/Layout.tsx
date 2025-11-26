@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Wallet, CreditCard, PiggyBank, LineChart, LogOut } from 'lucide-react';
+import { LayoutDashboard, Wallet, CreditCard, PiggyBank, LineChart, LogOut, Flag } from 'lucide-react';
 
 const Layout: React.FC = () => {
     const { logout } = useAuth();
@@ -33,6 +33,10 @@ const Layout: React.FC = () => {
                     <Link to="/budget" className="flex items-center space-x-3 hover:text-accent transition">
                         <PiggyBank size={20} />
                         <span>收支預算</span>
+                    </Link>
+                    <Link to="/goals" className="flex items-center space-x-3 hover:text-accent transition">
+                        <Flag size={20} />
+                        <span>夢想與目標</span>
                     </Link>
                     <Link to="/simulation" className="flex items-center space-x-3 hover:text-accent transition">
                         <LineChart size={20} />

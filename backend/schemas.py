@@ -93,10 +93,18 @@ class Expense(ExpenseBase):
         orm_mode = True
 
 # Future Goal Schemas
+from typing import List, Optional
+from datetime import datetime
+from pydantic import BaseModel
+
+# ... (previous schemas)
+
 class FutureGoalExpenseBase(BaseModel):
     name: str
     amount: float
     target_date: datetime
+    image_url: Optional[str] = None
+    goal_type: str = "lump_sum"
 
 class FutureGoalExpenseCreate(FutureGoalExpenseBase):
     pass

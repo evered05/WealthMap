@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
-from .. import models, schemas, database, auth, engine
+import models, schemas, database, auth, engine
 
 router = APIRouter(
     tags=["finance"],
@@ -222,9 +222,21 @@ def read_expenses(skip: int = 0, limit: int = 100, db: Session = Depends(databas
     return expenses
 
 # Future Goals
+import urllib.parse
+
+# ...
+
 @router.post("/goals", response_model=schemas.FutureGoalExpense)
 def create_goal(goal: schemas.FutureGoalExpenseCreate, db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
+    # Generate AI Image URL
+    prompt = f"minimalist flat vector icon of {goal.name}, white background, simple, clean, high quality"
+    encoded_prompt = urllib.parse.quote(prompt)
+    image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=200&height=200&nologo=true"
+    
+    # Create DB Object
     db_goal = models.FutureGoalExpense(**goal.dict(), owner_id=current_user.id)
+    db_goal.image_url = image_url # Override/Set image_url
+    
     db.add(db_goal)
     db.commit()
     db.refresh(db_goal)
@@ -234,6 +246,28 @@ def create_goal(goal: schemas.FutureGoalExpenseCreate, db: Session = Depends(dat
 def read_goals(skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
     goals = db.query(models.FutureGoalExpense).filter(models.FutureGoalExpense.owner_id == current_user.id).offset(skip).limit(limit).all()
     return goals
+
+@router.put("/goals/{goal_id}", response_model=schemas.FutureGoalExpense)
+def update_goal(goal_id: int, goal: schemas.FutureGoalExpenseCreate, db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
+    db_goal = db.query(models.FutureGoalExpense).filter(models.FutureGoalExpense.id == goal_id, models.FutureGoalExpense.owner_id == current_user.id).first()
+    if not db_goal:
+        raise HTTPException(status_code=404, detail="Goal not found")
+    
+    # Check if name changed to regenerate image (optional, maybe skip to save API calls/time)
+    # For now, let's regenerate if name changes
+    if goal.name != db_goal.name:
+        prompt = f"minimalist flat vector icon of {goal.name}, white background, simple, clean, high quality"
+        encoded_prompt = urllib.parse.quote(prompt)
+        image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=200&height=200&nologo=true"
+        db_goal.image_url = image_url
+
+    for key, value in goal.dict().items():
+        if key != 'image_url': # Don't overwrite image_url unless we regenerated it
+             setattr(db_goal, key, value)
+    
+    db.commit()
+    db.refresh(db_goal)
+    return db_goal
 
 @router.delete("/goals/{goal_id}")
 def delete_goal(goal_id: int, db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):

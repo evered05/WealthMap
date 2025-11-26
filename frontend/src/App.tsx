@@ -8,6 +8,7 @@ import Assets from './pages/Assets';
 import Liabilities from './pages/Liabilities';
 import Budget from './pages/Budget';
 import Simulation from './pages/Simulation';
+import Goals from './pages/Goals';
 
 function App() {
     return (
@@ -24,6 +25,7 @@ function App() {
                         <Route path="liabilities" element={<Liabilities />} />
                         <Route path="budget" element={<Budget />} />
                         <Route path="simulation" element={<Simulation />} />
+                        <Route path="goals" element={<Goals />} />
                     </Route>
                 </Routes>
             </Router>

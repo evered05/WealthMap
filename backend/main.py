@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from . import models, database
-from .routers import auth, finance, simulation
+import models, database
+from routers import auth, finance, simulation
 
 # Create tables
 models.Base.metadata.create_all(bind=database.engine)
@@ -9,10 +9,7 @@ models.Base.metadata.create_all(bind=database.engine)
 app = FastAPI(title="WealthMap API")
 
 # CORS Configuration
-origins = [
-    "http://localhost:3000", # React default port
-    "http://localhost:5173", # Vite default port
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
